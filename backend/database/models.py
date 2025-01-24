@@ -73,7 +73,7 @@ class Fields(SQLModel, table=True):
 
 class Media(SQLModel, table=True):
     id: UUID = Field(primary_key=True, default=lambda: uuid4())
-    data: bytes = Field(sa_column_args={"type_": LargeBinary})
+    data: bytes = Field(sa_column_args=[LargeBinary])
     product_id: UUID = Field(foreign_key="product.id")
     product: Product = Relationship(
         back_populates="medias",
