@@ -4,7 +4,7 @@ from typing import List
 
 
 class BaseModel(SQLModel):
-    id: int | None = Field(primary_key=True)
+    id: int | None = Field(primary_key=True, default=None)
 
 
 class User(BaseModel, table=True):
@@ -34,10 +34,10 @@ class Categories(BaseModel, table=True):
 class Listing(BaseModel, table=True):
     listing_name: str
     listing_price: float
-    category_id: int | None = Field(foreign_key="categories.id")
+    category_id: int | None = Field(foreign_key="categories.id", default=None)
     desc: str
 
-    user_id: int | None = Field(foreign_key="user.id")
+    user_id: int | None = Field(foreign_key="user.id", default=None)
     user: User = Relationship(back_populates="listings")
 
     medias: List["Media"] = Relationship(
@@ -72,14 +72,14 @@ class Fields(BaseModel, table=True):
     field_name: str
     field_value: str
 
-    listing_id: int | None = Field(foreign_key="listing.id")
+    listing_id: int | None = Field(foreign_key="listing.id", default=None)
     listing: Listing = Relationship(back_populates="fields")
 
 
 class Media(BaseModel, table=True):
     data: bytes = Field(sa_column_args=[LargeBinary])
 
-    listing_id: int | None = Field(foreign_key="listing.id")
+    listing_id: int | None = Field(foreign_key="listing.id", default=None)
     listing: Listing = Relationship(
         back_populates="medias",
         sa_relationship_kwargs={
