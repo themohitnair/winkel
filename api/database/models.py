@@ -63,7 +63,7 @@ class Listing(BaseModel, table=True):
     )
 
     # mapped to listing in Field -> one listing has several fields
-    fields: List["Field"] = Relationship(
+    fields: List["Parameter"] = Relationship(
         back_populates="listing",
         sa_relationship_kwargs={
             "cascade": "all, delete-orphan",
@@ -73,14 +73,14 @@ class Listing(BaseModel, table=True):
     )
 
 
-class Field(BaseModel, table=True):
+class Parameter(BaseModel, table=True):
     field_name: str
     field_value: str
 
     listing_id: int | None = Field(foreign_key="listing.id", default=None)
 
     # mapped to fields in Listing -> one field is part of one listing
-    listing: Listing = Relationship(back_populates="fields")
+    listing: Listing = Relationship(back_populates="parameters")
 
 
 class Media(BaseModel, table=True):
