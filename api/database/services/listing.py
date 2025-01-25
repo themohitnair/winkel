@@ -1,4 +1,5 @@
-from sqlmodel import Sequence, Session
+from sqlmodel import Session
+from typing import Sequence
 from database.repository import ListingRepository
 from database.models import Listing
 

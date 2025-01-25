@@ -1,7 +1,8 @@
 from sqlmodel import Session
-from typing import List
+from typing import Sequence
 from database.repository import UserRepository
 from database.models import User
+from datetime import date as Date
 
 
 class UserService:
@@ -10,13 +11,15 @@ class UserService:
         self.user_repository = UserRepository(self.session)
 
     def create_user(
-        self, user_name: str, user_email: str, college_id: str, ph_no: str
+        self, user_name: str, user_email: str, college_id: str, ph_no: str, rating: float, date_of_birth: Date
     ) -> User:
         user = User(
             user_name=user_name,
             user_email=user_email,
             college_id=college_id,
             ph_no=ph_no,
+            rating=rating,
+            date_of_birth=date_of_birth,
         )
         return self.user_repository.create(user)
 
@@ -27,7 +30,7 @@ class UserService:
         except Exception as e:
             raise e
 
-    def get_all_users(self) -> List[User]:
+    def get_all_users(self) -> Sequence[User]:
         return self.user_repository.get_all()
 
     def update_user(
