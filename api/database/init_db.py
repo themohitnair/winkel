@@ -1,23 +1,17 @@
-from contextlib import asynccontextmanager
-from sqlmodel import Session, SQLModel
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from contextlib import contextmanager
+from sqlmodel import create_engine, Session, SQLModel
 
 
 class DatabaseSessionManager:
     def __init__(self, connection_string: str):
-        self.engine = create_async_engine(url=connection_string)
-        self.asyn_session_factory = sessionmaker(
-            bind=self.engine, class_=AsyncSession, expire_on_commit=False
-        )
+        self.engine = create_engine(connection_string)
 
     def create_tables(self):
-        async with self.engine.begin() as conn:
-            await conn.run_sync(SQLModel.metadata.create_all())
+        SQLModel.metadata.create_all(self.engine)
 
-    @asynccontextmanager
+    @contextmanager
     def session_scope(self):
-        session = AsyncEngine(self.engine)
+        session = Session(self.engine)
         try:
             yield session
             session.commit()
@@ -28,7 +22,7 @@ class DatabaseSessionManager:
             session.close()
 
     def get_session(self) -> Session:
-        return AsyncSession(self.engine)
+        return Session(self.engine)
 
 
 # def example_usage():

@@ -1,6 +1,6 @@
 from typing import Sequence, TypeVar, Generic
 from sqlmodel import Session, select
-from database.models import BaseModel, User, Categories, Listing, Media, Fields
+from database.models import BaseModel, User, Category, Listing, Media, Parameter
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -58,9 +58,9 @@ class ListingRepository(BaseRepository[Listing]):
         super().__init__(Listing, session)
 
 
-class CategoriesRepository(BaseRepository[Categories]):
+class CategoryRepository(BaseRepository[Category]):
     def __init__(self, session: Session):
-        super().__init__(Categories, session)
+        super().__init__(Category, session)
 
 
 class MediaRepository(BaseRepository[Media]):
@@ -68,6 +68,6 @@ class MediaRepository(BaseRepository[Media]):
         super().__init__(Media, session)
 
 
-class FieldsRepository(BaseRepository[Fields]):
+class FieldsRepository(BaseRepository[Parameter]):
     def __init__(self, session: Session):
-        super().__init__(Fields, session)
+        super().__init__(Parameter, session)

@@ -80,7 +80,7 @@ class Parameter(BaseModel, table=True):
     listing_id: int | None = Field(foreign_key="listing.id", default=None)
 
     # mapped to fields in Listing -> one field is part of one listing
-    listing: Listing = Relationship(back_populates="fields")
+    listing: Listing = Relationship(back_populates="parameters")
 
 
 class Media(BaseModel, table=True):
