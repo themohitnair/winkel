@@ -42,7 +42,7 @@ class UserRepository(BaseRepository):
         super().__init__(User, session)
 
 
-class ProductRepository(BaseRepository):
+class ListingRepository(BaseRepository):
     def __init__(self, session: Session):
         super().__init__(Product, session)
 
