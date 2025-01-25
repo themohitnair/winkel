@@ -1,5 +1,4 @@
-from sqlmodel import Session
-from typing import List
+from sqlmodel import Sequence, Session
 from database.repository import ListingRepository
 from database.models import Listing
 
@@ -33,7 +32,7 @@ class ListingService:
         except Exception as e:
             raise e
 
-    def get_all_listing(self) -> List[Listing]:
+    def get_all_listing(self) -> Sequence[Listing]:
         return self.listing_repository.get_all()
 
     def update_listing(
@@ -52,6 +51,7 @@ class ListingService:
             listing.category_id = category_id
             listing.desc = desc
             listing.user_id = user_id
+            return self.listing_repository.update(listing)
         except Exception as e:
             raise e
 
