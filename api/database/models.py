@@ -1,4 +1,5 @@
 from sqlmodel import Field, SQLModel, Relationship, LargeBinary, UUID
+from datetime import date as Date
 from typing import List
 from uuid import uuid4
 
@@ -11,6 +12,8 @@ class User(BaseModel, table=True):
     user_name: str
     user_email: str
     college_id: str
+    rating: float
+    date_of_birth: Date
     ph_no: str
 
     listing: List["Listing"] = Relationship(back_populates="user")
@@ -33,6 +36,7 @@ class Listing(BaseModel, table=True):
     listing_name: str
     listing_price: float
     category_id: UUID = Field(foreign_key="categories.id")
+    desc: str
 
     user_id: UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="listings")
