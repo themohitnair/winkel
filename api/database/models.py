@@ -13,13 +13,13 @@ class User(BaseModel, table=True):
     college_id: str
     ph_no: str
 
-    products: List["Product"] = Relationship(back_populates="user")
+    listing: List["Listing"] = Relationship(back_populates="user")
 
 
 class Categories(BaseModel, table=True):
     category_name: str
 
-    products: List["Product"] = Relationship(
+    listings: List["Listing"] = Relationship(
         back_populates="categories",
         sa_relationship_kwargs={
             "cascade": "all, delete-orphan",
@@ -29,15 +29,16 @@ class Categories(BaseModel, table=True):
     )
 
 
-class Product(BaseModel, table=True):
-    product_name: str
-    product_price: float
+class Listing(BaseModel, table=True):
+    listing_name: str
+    listing_price: float
+    category_id: UUID = Field(foreign_key="categories.id")
 
     user_id: UUID = Field(foreign_key="user.id")
-    user: User = Relationship(back_populates="products")
+    user: User = Relationship(back_populates="listings")
 
     medias: List["Media"] = Relationship(
-        back_populates="product",
+        back_populates="listings",
         sa_relationship_kwargs={
             "cascade": "all, delete-orphan",
             "onupdate": "CASCADE",
@@ -45,8 +46,8 @@ class Product(BaseModel, table=True):
         },
     )
 
-    categories: List[Categories] = Relationship(
-        back_populates="products",
+    categories: Categories = Relationship(
+        back_populates="listings",
         sa_relationship_kwargs={
             "cascade": "all, delete-orphan",
             "onupdate": "CASCADE",
@@ -55,7 +56,7 @@ class Product(BaseModel, table=True):
     )
 
     fields: List["Fields"] = Relationship(
-        back_populates="product",
+        back_populates="listings",
         sa_relationship_kwargs={
             "cascade": "all, delete-orphan",
             "onupdate": "CASCADE",
@@ -68,15 +69,15 @@ class Fields(BaseModel, table=True):
     field_name: str
     field_value: str
 
-    product_id: UUID = Field(foreign_key="product.id")
-    product: Product = Relationship(back_populates="fields")
+    listing_id: UUID = Field(foreign_key="listing.id")
+    listing: Listing = Relationship(back_populates="fields")
 
 
 class Media(BaseModel, table=True):
     data: bytes = Field(sa_column_args=[LargeBinary])
 
-    product_id: UUID = Field(foreign_key="product.id")
-    product: Product = Relationship(
+    listing_id: UUID = Field(foreign_key="listing.id")
+    listing: Listing = Relationship(
         back_populates="medias",
         sa_relationship_kwargs={
             "cascade": "all, delete-orphan",
