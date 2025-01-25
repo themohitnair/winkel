@@ -11,9 +11,6 @@ class BaseRepository(Generic[T]):
         self.session = session
 
     def get(self, id: int) -> T:
-        if id is None:
-            raise ValueError("ID is required")
-
         entity = self.session.get(self.model, id)
         if entity is None:
             raise ValueError(f"{self.model.__name__} with id {id} not found")
