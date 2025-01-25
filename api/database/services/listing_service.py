@@ -38,10 +38,14 @@ class ListingService:
 
     def update_listing(
         self,
+        listing_id: UUID,
         listing_name: str,
         listing_price: float,
         category_id: UUID,
         desc: str,
         user_id: UUID,
     ):
-    try:
+        try:
+            listing = self.listing_repository.get(id)
+        except Exception as e:
+            return e
