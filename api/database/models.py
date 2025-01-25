@@ -63,7 +63,7 @@ class Listing(BaseModel, table=True):
     )
 
     # mapped to listing in Field -> one listing has several fields
-    fields: List["Param"] = Relationship(
+    fields: List["Parameter"] = Relationship(
         back_populates="listing",
         sa_relationship_kwargs={
             "cascade": "all, delete-orphan",
@@ -73,7 +73,7 @@ class Listing(BaseModel, table=True):
     )
 
 
-class Param(BaseModel, table=True):
+class Parameter(BaseModel, table=True):
     field_name: str
     field_value: str
 
