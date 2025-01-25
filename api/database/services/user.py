@@ -1,7 +1,7 @@
-from database.models import User
-from typing import List, Optional
+from sqlmodel import Session
+from typing import List
 from database.repository import UserRepository
-from sqlmodel import Session, UUID
+from database.models import User
 
 
 class UserService:
@@ -12,27 +12,27 @@ class UserService:
     def create_user(
         self, user_name: str, user_email: str, college_id: str, ph_no: str
     ) -> User:
-        try:
-            user = User(
-                user_name=user_name,
-                user_email=user_email,
-                college_id=college_id,
-                ph_no=ph_no,
-            )
-            repo = UserRepository(self.session)
-            return repo.create(user)
-        except Exception as e:
-            return e
+        user = User(
+            user_name=user_name,
+            user_email=user_email,
+            college_id=college_id,
+            ph_no=ph_no,
+        )
+        return self.user_repository.create(user)
 
-    def get_user_by_id(self, user_id: UUID) -> Optional[User]:
-        return self.user_repository.get(user_id)
+    def get_user_by_id(self, user_id: int) -> User:
+        try:
+            user = self.user_repository.get(user_id)
+            return user
+        except Exception as e:
+            raise e
 
     def get_all_users(self) -> List[User]:
         return self.user_repository.get_all()
 
     def update_user(
         self,
-        user_id: UUID,
+        user_id: int,
         user_name: str,
         user_email: str,
         college_id: str,
@@ -46,11 +46,11 @@ class UserService:
             user.ph_no = ph_no
             return self.user_repository.update(user)
         except Exception as e:
-            return e
+            raise e
 
-    def delete_user(self, user_id: UUID) -> User:
+    def delete_user(self, user_id: int):
         try:
             user = self.user_repository.get(user_id)
             return self.user_repository.delete(user)
         except Exception as e:
-            return e
+            raise e
