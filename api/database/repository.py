@@ -1,7 +1,3 @@
-# i have made some changes to the models and also crud_for_models file
-# depending on what uttam wants and how he will work i will change shit
-# so i will do this after asking him tomorrow
-
 from typing import type, List, TypeVar, Generic
 from sqlmodel import Session, select
 from database.models import BaseModel, User, Categories, Product, Media, Fields
@@ -64,19 +60,3 @@ class MediaRepository(BaseRepository):
 class FieldsRepository(BaseRepository):
     def __init__(self, session: Session):
         super().__init__(Fields, session)
-
-
-class UserService:
-    def __init__(self, user_repository: UserRepository):
-        self.user_repository = user_repository
-
-    def create_user(
-        self, user_name: str, user_email: str, college_id: str, ph_no: str
-    ) -> User:
-        user = User(
-            user_name=user_name,
-            user_email=user_email,
-            college_id=college_id,
-            ph_no=ph_no,
-        )
-        return self.user_repository.create(user)
