@@ -16,12 +16,7 @@ class ListingService(Database):
         user_id: int,
         desc: str,
     ):
-        if not self.conn:
-            await self.connect()
-
-        if not self.conn:
-            raise ConnectionError("Could not connect to the database")
-
+        await self.connect()
         try:
             async with self.conn.execute(
                 """
@@ -37,11 +32,7 @@ class ListingService(Database):
             raise RuntimeError(f"Failed to create listing: {e}")
 
     async def get_listing_by_id(self, listing_id: int) -> Listing:
-        if not self.conn:
-            await self.connect()
-
-        if not self.conn:
-            raise ConnectionError("Could not connect to the database")
+        await self.connect()
 
         try:
             async with self.conn.execute(
@@ -64,11 +55,7 @@ class ListingService(Database):
             raise RuntimeError(f"Failed to retrieve listing with ID {listing_id}: {e}")
 
     async def get_all_listing(self) -> List[Listing]:
-        if not self.conn:
-            await self.connect()
-
-        if not self.conn:
-            raise ConnectionError("Could not connect to the database")
+        await self.connect()
 
         try:
             async with self.conn.execute("SELECT * FROM listing") as cursor:
@@ -100,11 +87,7 @@ class ListingService(Database):
         desc: str,
         user_id: int,
     ):
-        if not self.conn:
-            await self.connect()
-
-        if not self.conn:
-            raise ConnectionError("Could not connect to the database")
+        await self.connect()
 
         try:
             result = await self.conn.execute(
@@ -123,11 +106,7 @@ class ListingService(Database):
             raise RuntimeError(f"Failed to update listing with ID {listing_id}: {e}")
 
     async def delete_listing(self, listing_id: int):
-        if not self.conn:
-            await self.connect()
-
-        if not self.conn:
-            raise ConnectionError("Could not connect to the database")
+        await self.connect()
 
         try:
             result = await self.conn.execute(

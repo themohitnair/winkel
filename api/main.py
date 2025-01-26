@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from database.init import Database
 from config import setup_logging
 import logging
+from routes import user
 
 setup_logging()
 
@@ -21,6 +22,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.include_router(user.user_router)
 
 
 @app.get("/")
