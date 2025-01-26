@@ -1,42 +1,97 @@
-from sqlmodel import Session
-from typing import Sequence
-from database.repository import ListingRepository
-from database.models import Listing
+from database.init import Database
+from typing import List
+
+from models.listing import Listing
 
 
-class ListingService:
-    def __init__(self, session: Session):
-        self.session = session
-        self.listing_repository = ListingRepository(self.session)
+class ListingService(Database):
+    def __init__(self, db_path: str = "database.db"):
+        super().__init__(db_path)
 
-    def create_listing(
+    async def create_listing(
         self,
         listing_name: str,
         listing_price: float,
         category_id: int,
         user_id: int,
         desc: str,
-    ) -> Listing:
-        listing = Listing(
-            listing_name=listing_name,
-            listing_price=listing_price,
-            category_id=category_id,
-            user_id=user_id,
-            desc=desc,
-        )
-        return self.listing_repository.create(listing)
+    ):
+        if not self.conn:
+            await self.connect()
 
-    def get_listing_by_id(self, listing_id: int) -> Listing:
+        if not self.conn:
+            raise ConnectionError("Could not connect to the database")
+
         try:
-            listing = self.listing_repository.get(listing_id)
-            return listing
+            async with self.conn.execute(
+                """
+                INSERT INTO listing (listing_name, listing_price, category_id, "desc", user_id)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (listing_name, listing_price, category_id, desc, user_id),
+            ) as cursor:
+                last_row_id = cursor.lastrowid
+            await self.conn.commit()
+            return last_row_id
         except Exception as e:
-            raise e
+            raise RuntimeError(f"Failed to create listing: {e}")
 
-    def get_all_listing(self) -> Sequence[Listing]:
-        return self.listing_repository.get_all()
+    async def get_listing_by_id(self, listing_id: int) -> Listing:
+        if not self.conn:
+            await self.connect()
 
-    def update_listing(
+        if not self.conn:
+            raise ConnectionError("Could not connect to the database")
+
+        try:
+            async with self.conn.execute(
+                "SELECT * FROM listing WHERE id = ?", (listing_id,)
+            ) as cursor:
+                row = await cursor.fetchone()
+
+            if not row:
+                raise ValueError(f"Listing with ID {listing_id} not found.")
+
+            return Listing(
+                id=row[0],
+                listing_name=row[1],
+                listing_price=row[2],
+                category_id=row[3],
+                desc=row[4],
+                user_id=row[5],
+            )
+        except Exception as e:
+            raise RuntimeError(f"Failed to retrieve listing with ID {listing_id}: {e}")
+
+    async def get_all_listing(self) -> List[Listing]:
+        if not self.conn:
+            await self.connect()
+
+        if not self.conn:
+            raise ConnectionError("Could not connect to the database")
+
+        try:
+            async with self.conn.execute("SELECT * FROM listing") as cursor:
+                rows = await cursor.fetchall()
+
+            if not rows:
+                return []
+
+            return [
+                Listing(
+                    id=row[0],
+                    listing_name=row[1],
+                    listing_price=row[2],
+                    category_id=row[3],
+                    desc=row[4],
+                    user_id=row[5],
+                )
+                for row in rows
+            ]
+        except Exception as e:
+            raise RuntimeError(f"Failed to retrieve all listings: {e}")
+
+    async def update_listing(
         self,
         listing_id: int,
         listing_name: str,
@@ -44,21 +99,45 @@ class ListingService:
         category_id: int,
         desc: str,
         user_id: int,
-    ) -> Listing:
-        try:
-            listing = self.listing_repository.get(listing_id)
-            listing.listing_name = listing_name
-            listing.listing_price = listing_price
-            listing.category_id = category_id
-            listing.desc = desc
-            listing.user_id = user_id
-            return self.listing_repository.update(listing)
-        except Exception as e:
-            raise e
+    ):
+        if not self.conn:
+            await self.connect()
 
-    def delete_listing(self, listing_id: int):
+        if not self.conn:
+            raise ConnectionError("Could not connect to the database")
+
         try:
-            listing = self.listing_repository.get(listing_id)
-            return self.listing_repository.delete(listing)
+            result = await self.conn.execute(
+                """
+                UPDATE listing
+                SET listing_name = ?, listing_price = ?, category_id = ?, "desc" = ?, user_id = ?
+                WHERE id = ?
+                """,
+                (listing_name, listing_price, category_id, desc, user_id, listing_id),
+            )
+            await self.conn.commit()
+
+            if result.rowcount == 0:
+                raise ValueError(f"Listing with ID {listing_id} not found for update.")
         except Exception as e:
-            raise e
+            raise RuntimeError(f"Failed to update listing with ID {listing_id}: {e}")
+
+    async def delete_listing(self, listing_id: int):
+        if not self.conn:
+            await self.connect()
+
+        if not self.conn:
+            raise ConnectionError("Could not connect to the database")
+
+        try:
+            result = await self.conn.execute(
+                "DELETE FROM listing WHERE id = ?", (listing_id,)
+            )
+            await self.conn.commit()
+
+            if result.rowcount == 0:
+                raise ValueError(
+                    f"Listing with ID {listing_id} not found for deletion."
+                )
+        except Exception as e:
+            raise RuntimeError(f"Failed to delete listing with ID {listing_id}: {e}")
