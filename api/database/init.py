@@ -1,5 +1,8 @@
 import aiosqlite
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Database:
@@ -9,12 +12,15 @@ class Database:
 
     async def connect(self):
         self.conn = await aiosqlite.connect(self.db_path)
+
         await self.conn.execute("PRAGMA foreign_keys = ON")
         await self.conn.commit()
+        logger.info("Database connection established")
 
     async def close(self):
         if self.conn:
             await self.conn.close()
+            logger.info("Database connection closed")
 
     async def init_db(self):
         if not self.conn:
@@ -25,7 +31,7 @@ class Database:
 
         await self.conn.execute(
             """
-            CREATE TABLE user (
+            CREATE TABLE IF NOT EXISTS user (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_name TEXT NOT NULL,
                 user_email TEXT NOT NULL,
@@ -39,7 +45,7 @@ class Database:
 
         await self.conn.execute(
             """
-            CREATE TABLE category (
+            CREATE TABLE IF NOT EXISTS category (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 category_name TEXT NOT NULL
             );
@@ -48,7 +54,7 @@ class Database:
 
         await self.conn.execute(
             """
-            CREATE TABLE listing (
+            CREATE TABLE IF NOT EXISTS listing (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 listing_name TEXT NOT NULL,
                 listing_price REAL NOT NULL,
@@ -63,7 +69,7 @@ class Database:
 
         await self.conn.execute(
             """
-            CREATE TABLE parameter (
+            CREATE TABLE IF NOT EXISTS parameter (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 field_name TEXT NOT NULL,
                 field_value TEXT NOT NULL,
@@ -75,7 +81,7 @@ class Database:
 
         await self.conn.execute(
             """
-            CREATE TABLE media (
+            CREATE TABLE IF NOT EXISTS media (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 data BLOB NOT NULL,
                 listing_id INTEGER,
@@ -84,7 +90,11 @@ class Database:
             """
         )
 
+        logger.info("Tables created.")
+
         await self.conn.commit()
+
+        logger.info("Tables committed.")
 
     async def __aenter__(self):
         await self.connect()
