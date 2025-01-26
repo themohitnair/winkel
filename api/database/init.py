@@ -56,12 +56,13 @@ class Database:
             """
             CREATE TABLE IF NOT EXISTS user (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_name TEXT NOT NULL,
-                user_email TEXT NOT NULL UNIQUE,
+                email TEXT NOT NULL UNIQUE,
+                first_name TEXT NOT NULL,
+                last_name TEXT NOT NULL,
                 uni_serial_number TEXT NOT NULL,
-                rating REAL NOT NULL DEFAULT 0.0,
                 date_of_birth DATE NOT NULL,
-                ph_no TEXT NOT NULL
+                ph_no TEXT NOT NULL,
+                rating REAL NOT NULL DEFAULT 0.0,
             );
             """
         )
@@ -70,7 +71,7 @@ class Database:
             """
             CREATE TABLE IF NOT EXISTS category (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                category_name TEXT NOT NULL
+                name TEXT NOT NULL
             );
             """
         )
