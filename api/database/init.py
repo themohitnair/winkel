@@ -20,6 +20,9 @@ class Database:
         if not self.conn:
             await self.connect()
 
+        if not self.conn:
+            raise ConnectionError("Could not connect to the database")
+
         await self.conn.execute(
             """
             CREATE TABLE user (
@@ -53,7 +56,7 @@ class Database:
                 desc TEXT NOT NULL,
                 user_id INTEGER,
                 FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE ON UPDATE CASCADE,
-                FOREIGN KEY (user_id) REFERENCES user(id)
+                FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE
             );
             """
         )
@@ -89,3 +92,4 @@ class Database:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.close()
+
