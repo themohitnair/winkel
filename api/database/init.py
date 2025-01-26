@@ -15,28 +15,51 @@ class Database:
 
         await self.conn.execute("PRAGMA foreign_keys = ON")
         await self.conn.commit()
-        logger.info("Database connection established")
+        logger.info("Database connection established. ")
 
     async def close(self):
         if self.conn:
             await self.conn.close()
-            logger.info("Database connection closed")
+            logger.info("Database connection closed. ")
+
+    async def seed_categories(self):
+        categories = [
+            ("Books",),
+            ("Electronics",),
+            ("Furniture",),
+            ("Stationery",),
+            ("Clothing",),
+            ("Accessories",),
+            ("Sports Equipment",),
+            ("Musical Instruments",),
+            ("Vehicles",),
+            ("Room Decor",),
+            ("Kitchenware",),
+            ("Health & Fitness",),
+            ("Gaming",),
+            ("Miscellaneous",),
+        ]
+        await self.conn.executemany(
+            "INSERT OR IGNORE INTO category (category_name) VALUES (?)", categories
+        )
+        await self.conn.commit()
 
     async def init_db(self):
         if not self.conn:
             await self.connect()
 
         if not self.conn:
-            raise ConnectionError("Could not connect to the database")
+            raise ConnectionError("Could not connect to the database. ")
 
+        await self.conn.execute("BEGIN")
         await self.conn.execute(
             """
             CREATE TABLE IF NOT EXISTS user (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_name TEXT NOT NULL,
-                user_email TEXT NOT NULL,
+                user_email TEXT NOT NULL UNIQUE,
                 uni_serial_number TEXT NOT NULL,
-                rating REAL NOT NULL,
+                rating REAL NOT NULL DEFAULT 0.0,
                 date_of_birth DATE NOT NULL,
                 ph_no TEXT NOT NULL
             );
@@ -92,6 +115,33 @@ class Database:
 
         logger.info("Tables created.")
 
+        await self.conn.execute(
+            """
+            CREATE INDEX idx_listing_category_id ON listing(category_id);
+            """
+        )
+        await self.conn.execute(
+            """
+            CREATE INDEX idx_listing_user_id ON listing(user_id);
+            """
+        )
+        await self.conn.execute(
+            """
+            CREATE INDEX idx_parameter_listing_id ON parameter(listing_id);
+            """
+        )
+        await self.conn.execute(
+            """
+            CREATE INDEX idx_media_listing_id ON media(listing_id);
+            """
+        )
+
+        logger.info("Indexes established.")
+
+        await self.seed_categories()
+
+        logger.info("Categories seeded.")
+
         await self.conn.commit()
 
         logger.info("Tables committed.")
@@ -102,4 +152,3 @@ class Database:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.close()
-
