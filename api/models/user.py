@@ -45,3 +45,14 @@ class UserInit(BaseModel):
         if branch_code not in valid_branches:
             raise ValueError(f"Invalid branch code: {branch_code}")
         return v
+
+
+# used for verification during login and signup
+class UserVerify(BaseModel):
+    email: EmailStr
+    otp: str = Field(
+        min_length=6,
+        max_length=6,
+        pattern=r"^\d{6}$",
+        examples=["123456"],
+    )
