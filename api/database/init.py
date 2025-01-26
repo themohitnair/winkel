@@ -40,7 +40,7 @@ class Database:
             ("Miscellaneous",),
         ]
         await self.conn.executemany(
-            "INSERT OR IGNORE INTO category (category_name) VALUES (?)", categories
+            "INSERT OR IGNORE INTO category (name) VALUES (?)", categories
         )
         await self.conn.commit()
 
@@ -62,7 +62,7 @@ class Database:
                 uni_serial_number TEXT NOT NULL,
                 date_of_birth DATE NOT NULL,
                 ph_no TEXT NOT NULL,
-                rating REAL NOT NULL DEFAULT 0.0,
+                rating REAL NOT NULL DEFAULT 0.0
             );
             """
         )
