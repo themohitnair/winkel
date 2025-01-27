@@ -23,7 +23,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-app.include_router(user.user_router)
+app.include_router(user.router)
 
 
 @app.get("/")
