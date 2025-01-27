@@ -9,7 +9,7 @@ class UserInit(BaseModel):
     uni_serial_number: str = Field(
         max_length=10,
         min_length=10,
-        pattern=r"^1MS\d{2}(IS|CS|EE|EC|ET|EI|ME|IM|MD|AD|AI|BT|CH|CV|CI|CY)\d{3}$",
+        pattern=r"^1MS\d{2}(IS|CS|EE|EC|ET|EI|ME|IM|MD|AD|AI|BT|CH|CV|CI|CY)\d{3}(?:-T)$",
         examples=["1MS22IS079", "1MS23EC123"],
     )
     ph_no: str = Field(
