@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import VercelOtpInput from "@/components/VercelOtpInput"
 
 export default function LoginPage() {
   const [step, setStep] = useState(1)
@@ -20,9 +21,13 @@ export default function LoginPage() {
       setStep(2)
     } else {
       // TODO: Verify OTP and log in
-      console.log("Login complete", { phone })
+      console.log("Login complete", { phone, otp })
       router.push("/feed")
     }
+  }
+
+  const handleOtpComplete = (value: string) => {
+    setOtp(value)
   }
 
   return (
@@ -52,15 +57,8 @@ export default function LoginPage() {
             {step === 2 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="otp">OTP</Label>
-                  <Input
-                    id="otp"
-                    type="text"
-                    placeholder="Enter the OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    required
-                  />
+                  <Label htmlFor="otp">Enter OTP</Label>
+                  <VercelOtpInput length={6} onComplete={handleOtpComplete} />
                 </div>
               </div>
             )}

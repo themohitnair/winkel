@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import VercelOtpInput from "@/components/VercelOtpInput"
 
 export default function SignupPage() {
   const [step, setStep] = useState(1)
@@ -26,9 +27,13 @@ export default function SignupPage() {
       setStep(3)
     } else {
       // TODO: Complete signup
-      console.log("Signup complete", { phone, fullName, usn, dob })
+      console.log("Signup complete", { phone, otp, fullName, usn, dob })
       router.push("/feed")
     }
+  }
+
+  const handleOtpComplete = (value: string) => {
+    setOtp(value)
   }
 
   return (
@@ -58,15 +63,8 @@ export default function SignupPage() {
             {step === 2 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="otp">OTP</Label>
-                  <Input
-                    id="otp"
-                    type="text"
-                    placeholder="Enter the OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    required
-                  />
+                  <Label htmlFor="otp">Enter OTP</Label>
+                  <VercelOtpInput length={6} onComplete={handleOtpComplete} />
                 </div>
               </div>
             )}
@@ -97,7 +95,7 @@ export default function SignupPage() {
                 <div className="space-y-2">
                   <Label htmlFor="dob">Date of Birth</Label>
                   <Input id="dob" type="date" value={dob} onChange={(e) => setDob(e.target.value)} required />
-                </div>
+                </div>                
               </div>
             )}
             <Button type="submit" className="w-full mt-4">
