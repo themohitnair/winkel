@@ -13,9 +13,9 @@ class Database:
         self.logger = logging.getLogger(__name__)
 
         self.db_name = os.getenv("DB_NAME")
-        self.db_member = os.getenv("DB_member")
+        self.db_user = os.getenv("DB_USER")
 
-        if not all([self.db_member, self.db_name]):
+        if not all([self.db_user, self.db_name]):
             raise ValueError("Missing required database environment variables.")
 
     async def create_db(self, connection: asyncpg.Connection):
@@ -61,7 +61,7 @@ class Database:
                 categories,
             )
 
-            print("Categories seeded successfully.")
+            self.logger.info("Categories seeded successfully.")
 
         except asyncpg.exceptions.UniqueViolationError as e:
             self.logger.warning(f"Unique violation error while seeding categories: {e}")
@@ -75,7 +75,7 @@ class Database:
                 await connection.execute("""
                 CREATE TABLE IF NOT EXISTS metrics (
                     id SERIAL PRIMARY KEY,
-                    num_users INTEGER DEFAULT 0,
+                    num_members INTEGER DEFAULT 0,
                     num_listings INTEGER DEFAULT 0,
                     num_sold_listings INTEGER DEFAULT 0,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -95,7 +95,7 @@ class Database:
                     num_buyer_ratings INTEGER DEFAULT 0,
                     sold_at TIMESTAMP,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
                 """)
                 await connection.execute("""
@@ -184,7 +184,7 @@ class Database:
         while attempt <= retries:
             try:
                 connection = await asyncpg.connect(
-                    member=self.db_member,
+                    user=self.db_user,
                     host="127.0.0.1",
                     port=5432,
                     database="postgres",
@@ -196,7 +196,7 @@ class Database:
                 await connection.close()
 
                 self.pool = await asyncpg.create_pool(
-                    member=self.db_member,
+                    user=self.db_user,
                     host="127.0.0.1",
                     port=5432,
                     database=self.db_name,
@@ -225,14 +225,3 @@ class Database:
         if self.pool:
             await self.pool.close()
             self.logger.info("Database connection pool flushed!")
-
-
-async def main():
-    db = Database()
-    await db.connect()
-    await db.disconnect()
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    asyncio.run(main())

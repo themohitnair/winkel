@@ -10,13 +10,30 @@ setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    db = Database()
     logger = logging.getLogger(__name__)
+
     try:
-        async with Database() as db:
-            logger.info("Database initialized")
-            yield
+        await db.connect()
+
+        async with db.pool.acquire() as connection:
+            if not await db.db_exists(connection):
+                await db.create_db(connection)
+
+            await db.create_tables(connection)
+
+            await db.seed_categories(connection)
+
+        app.state.db = db
+
+        yield
     except Exception as e:
-        logger.critical("Database initialization failed: %s", e, exc_info=True)
+        logger.critical("Error during database setup: %s", e, exc_info=True)
+        raise
+    finally:
+        if hasattr(app.state, "db"):
+            await app.state.db.disconnect()
+            logger.info("Database disconnected")
 
 
 app = FastAPI(lifespan=lifespan)
