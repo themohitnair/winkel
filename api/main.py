@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from database.init import Database
+from database.initialize import Database
 from config import setup_logging
 import logging
 from routes import user
@@ -13,12 +13,10 @@ async def lifespan(app: FastAPI):
     logger = logging.getLogger(__name__)
     try:
         async with Database() as db:
-            await db.init_db()
-        logger.info("Database initialization complete")
+            logger.info("Database initialized")
+            yield
     except Exception as e:
         logger.critical("Database initialization failed: %s", e, exc_info=True)
-        raise
-    yield
 
 
 app = FastAPI(lifespan=lifespan)
