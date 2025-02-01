@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from database.initialize import Database
 from config import setup_logging
@@ -6,6 +7,11 @@ import logging
 from routes import member, listing, category, parameter, media, metric
 
 setup_logging()
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "https://winkelshop.vercel.app",
+]
 
 
 @asynccontextmanager
@@ -37,6 +43,14 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(member.router)
 app.include_router(listing.router)
