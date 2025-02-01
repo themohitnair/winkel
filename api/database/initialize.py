@@ -35,6 +35,10 @@ class Database:
 
     async def seed_categories(self, connection: asyncpg.Connection):
         try:
+            existing_count = await connection.fetchval("SELECT COUNT(*) FROM category;")
+            if existing_count > 0:
+                self.logger.info("Categories already seeded, skipping...")
+                return
             categories = [
                 ("Books",),
                 ("Electronics",),
@@ -212,7 +216,7 @@ class Database:
                     self.logger.info(
                         f"Retrying in {delay} seconds... (Attempt {attempt}/{retries})"
                     )
-                    await asyncio.sleep(delay * attempt)
+                    await asyncio.sleep(min(delay * attempt, 30))
                 attempt += 1
 
         if self.pool is None:
