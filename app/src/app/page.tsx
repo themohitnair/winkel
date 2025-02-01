@@ -13,15 +13,13 @@ export default function Home() {
           <span className="font-bold">winkel</span>
         </Link>
         <nav className="ml-auto hidden md:flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
-            Features
-          </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+          <Link className="text-sm font-medium hover:underline underline-offset-4" href="https://github.com/themohitnair/winkel/blob/main/README.md">
             About
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
-            Contact
+          <Link className="text-sm font-medium hover:underline underline-offset-4" href="https://github.com/themohitnair/winkel">
+            Source Code
           </Link>
+          
         </nav>
         <Sheet>
           <SheetTrigger asChild>
