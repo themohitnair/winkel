@@ -129,7 +129,7 @@ class Database:
                 );
                 """)
                 await connection.execute("""
-                CREATE TABLE IF NOT EXISTS param (
+                CREATE TABLE IF NOT EXISTS parameter (
                     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                     listing_id UUID NOT NULL,
                     field_name TEXT NOT NULL,
@@ -150,8 +150,8 @@ class Database:
                     CREATE INDEX IF NOT EXISTS idx_listing_price ON listing(price);
                     CREATE INDEX IF NOT EXISTS idx_listing_created_at ON listing(created_at);
                     CREATE INDEX IF NOT EXISTS idx_media_listing_id ON media(listing_id);
-                    CREATE INDEX IF NOT EXISTS idx_param_listing_id ON param(listing_id);
-                    CREATE INDEX IF NOT EXISTS idx_param_field_name ON param(field_name);
+                    CREATE INDEX IF NOT EXISTS idx_parameter_listing_id ON parameter(listing_id);
+                    CREATE INDEX IF NOT EXISTS idx_parameter_field_name ON parameter(field_name);
                 """)
                 self.logger.info("Indices created!")
         except asyncpg.exceptions.DuplicateTableError as e:
