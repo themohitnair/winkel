@@ -3,6 +3,5 @@
 .venv
 .vscode
 __pycache__
-*.db
 logs
 app.log
