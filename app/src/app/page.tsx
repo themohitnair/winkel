@@ -51,10 +51,10 @@ export default function Home() {
           </div>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button asChild size="lg">
-              <Link href="/signup">Sign Up</Link>
+              <Link href="/auth/signup">Sign Up</Link>
             </Button>
             <Button variant="outline" asChild size="lg">
-              <Link href="/login">Log In</Link>
+              <Link href="/auth/login">Log In</Link>
             </Button>
           </div>
         </div>
