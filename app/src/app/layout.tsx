@@ -2,26 +2,28 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-    variable: "--font-inter",
+const font = Inter({
     subsets: ["latin"],
-});
+    weight: ["400", "700"],
+  });
 
 export const metadata: Metadata = {
-    title: "Winkel",
-    description: "Bridging Sellers and Buyers",
+  title: "winkel",
+  description: "College Marketplace",
 };
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <html lang="en">
-            <body className={`${inter.variable} antialiased`}>
-                {children}
-            </body>
-        </html>
-    );
+  return (
+    <html lang="en">
+      <body
+        className={`${font.className} antialiased`}
+      >
+        {children}
+      </body>
+    </html>
+  );
 }
