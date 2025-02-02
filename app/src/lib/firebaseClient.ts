@@ -1,5 +1,5 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, RecaptchaVerifier } from "firebase/auth";
+import { initializeApp, getApps, getApp } from "firebase/app"
+import { getAuth, RecaptchaVerifier } from "firebase/auth"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -8,10 +8,11 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
+}
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()
-const auth = getAuth(app);
-auth.useDeviceLanguage();
+const auth = getAuth(app)
+auth.useDeviceLanguage()
 
-export { auth, RecaptchaVerifier };
+export { auth, RecaptchaVerifier }
+
