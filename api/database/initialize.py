@@ -88,8 +88,8 @@ class Database:
                 await connection.execute("""
                 CREATE TABLE IF NOT EXISTS member (
                     firebase_id TEXT PRIMARY KEY,
-                    first_name TEXT NOT NULL UNIQUE,
-                    last_name TEXT NOT NULL UNIQUE,
+                    first_name TEXT NOT NULL,
+                    last_name TEXT NOT NULL,
                     phone_number TEXT NOT NULL UNIQUE,
                     university_serial_number TEXT NOT NULL,
                     verified BOOLEAN DEFAULT FALSE,
@@ -97,9 +97,9 @@ class Database:
                     num_seller_ratings INTEGER DEFAULT 0,
                     buyer_rating DECIMAL(3,2) DEFAULT 5.0 CHECK (buyer_rating BETWEEN 1 AND 5),
                     num_buyer_ratings INTEGER DEFAULT 0,
-                    sold_at TIMESTAMP,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(first_name, last_name)
                 );
                 """)
                 await connection.execute("""
@@ -120,6 +120,7 @@ class Database:
                     status TEXT CHECK (status IN ('available', 'sold')) DEFAULT 'available',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    sold_at TIMESTAMP,
                     FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE ON UPDATE CASCADE,
                     FOREIGN KEY (member_id) REFERENCES member(firebase_id) ON DELETE CASCADE ON UPDATE CASCADE
                 );

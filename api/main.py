@@ -31,8 +31,9 @@ async def lifespan(app: FastAPI):
             await db.seed_categories(connection)
 
         app.state.db = db
-
+        logger.info("Yielding app.")
         yield
+        logger.info("Un-yielding app.")
     except Exception as e:
         logger.critical("Error during database setup: %s", e, exc_info=True)
         raise
