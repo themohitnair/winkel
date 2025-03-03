@@ -1,9 +1,0 @@
-from fastapi import Depends, APIRouter
-from database.initialize import Database
-
-router = APIRouter(prefix="/listing", tags=["Listings"])
-
-
-@router.get("/")
-async def greet(db: Database = Depends(Database)):
-    return {"message": "Hi from listing router."}

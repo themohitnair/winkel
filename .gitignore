@@ -3,6 +3,4 @@
 .venv
 .vscode
 __pycache__
-logs
-app.log
-serviceAccountKey.json
+*.db
