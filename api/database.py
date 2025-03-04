@@ -24,7 +24,7 @@ class Database:
         ]
 
         await self.client.execute("""
-        CREATE TABLE IF NOT EXISTS categories (
+        CREATE TABLE IF NOT EXISTS category (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT UNIQUE
         )
@@ -37,20 +37,21 @@ class Database:
         flat_category_params = [cat for tup in category_tuples for cat in tup]
 
         await self.client.execute(
-            f"INSERT OR IGNORE INTO categories (name) VALUES {placeholders}",
+            f"INSERT OR IGNORE INTO category (name) VALUES {placeholders}",
             args=flat_category_params,
         )
 
         await self.client.execute("""
         CREATE TABLE IF NOT EXISTS user (
-            auth0_id TEXT PRIMARY KEY,
+            auth_id TEXT PRIMARY KEY,
             first_name TEXT,
             last_name TEXT,
-            dob TEXT,
             email TEXT UNIQUE,
-            usn TEXT UNIQUE,
             rating_buy REAL CHECK (rating_buy >= 0 AND rating_buy <= 5),
-            rating_sell REAL CHECK (rating_sell >= 0 AND rating_sell <= 5)
+            rating_sell REAL CHECK (rating_sell >= 0 AND rating_sell <= 5),
+            status TEXT CHECK (status IN ('active', 'deleted')) DEFAULT 'active',
+            created_at TEXT DEFAULT (datetime('now', 'utc')),
+            updated_at TEXT DEFAULT (datetime('now', 'utc'))
         )
         """)
 
@@ -59,10 +60,15 @@ class Database:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id TEXT,
             title TEXT,
+            description TEXT,
             category_id INTEGER,
             price REAL CHECK (price >= 0),
-            FOREIGN KEY (user_id) REFERENCES user(auth0_id),
-            FOREIGN KEY (category_id) REFERENCES category(id)
+            condition TEXT CHECK (condition IN ('new', 'usable', 'poor')) NOT NULL,
+            status TEXT CHECK (status IN ('available', 'sold')) DEFAULT 'available',
+            created_at TEXT DEFAULT (datetime('now', 'utc')),
+            updated_at TEXT DEFAULT (datetime('now', 'utc')),
+            FOREIGN KEY (user_id) REFERENCES user(auth_id) ON DELETE CASCADE,
+            FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL
         )
         """)
 
@@ -71,18 +77,40 @@ class Database:
             listing_id INTEGER,
             key TEXT,
             value TEXT,
-            FOREIGN KEY (listing_id) REFERENCES listing(id)
+            FOREIGN KEY (listing_id) REFERENCES listing(id) ON DELETE CASCADE
         )
         """)
 
         await self.client.execute("""
-        CREATE TABLE IF NOT EXISTS fields (
+        CREATE TABLE IF NOT EXISTS field (
             listing_id INTEGER,
             key TEXT,
             value TEXT,
             PRIMARY KEY (listing_id, key),
-            FOREIGN KEY (listing_id) REFERENCES listing(id)
+            FOREIGN KEY (listing_id) REFERENCES listing(id) ON DELETE CASCADE
         );
+        """)
+
+        await self.client.execute("""
+        CREATE TRIGGER IF NOT EXISTS update_user_timestamp
+        AFTER UPDATE ON user
+        FOR EACH ROW
+        WHEN NEW.updated_at = OLD.updated_at  -- Prevent infinite loop
+        BEGIN
+            UPDATE user SET updated_at = datetime('now', 'utc')
+            WHERE auth0_id = NEW.auth0_id;
+        END
+        """)
+
+        await self.client.execute("""
+        CREATE TRIGGER IF NOT EXISTS update_listing_timestamp
+        AFTER UPDATE ON listing
+        FOR EACH ROW
+        WHEN NEW.updated_at = OLD.updated_at
+        BEGIN
+            UPDATE listing SET updated_at = datetime('now', 'utc')
+            WHERE id = NEW.id;
+        END
         """)
 
 
