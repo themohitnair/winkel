@@ -1,6 +1,11 @@
 import libsql_client as libsql
-import asyncio
-# from config import TURSO_AUTH, TURSO_URL
+
+import logging.config
+from config import LOG_CONFIG
+
+
+logger = logging.config.dictConfig(LOG_CONFIG)
+logger = logging.getLogger(__name__)
 
 
 class Database:
@@ -9,6 +14,8 @@ class Database:
             url,
             auth_token=auth_token,
         )
+
+    logger.info("Creating tables...")
 
     async def create_tables(self):
         categories = [
@@ -43,15 +50,16 @@ class Database:
 
         await self.client.execute("""
         CREATE TABLE IF NOT EXISTS user (
-            auth_id TEXT PRIMARY KEY,
-            first_name TEXT,
-            last_name TEXT,
-            email TEXT UNIQUE,
-            rating_buy REAL CHECK (rating_buy >= 0 AND rating_buy <= 5),
-            rating_sell REAL CHECK (rating_sell >= 0 AND rating_sell <= 5),
-            status TEXT CHECK (status IN ('active', 'deleted')) DEFAULT 'active',
-            created_at TEXT DEFAULT (datetime('now', 'utc')),
-            updated_at TEXT DEFAULT (datetime('now', 'utc'))
+            auth_id TEXT PRIMARY KEY NOT NULL,
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            phone TEXT UNIQUE CHECK (LENGTH(phone) = 10),
+            rating_buy REAL DEFAULT 0.0 CHECK (rating_buy >= 0 AND rating_buy <= 5),
+            rating_sell REAL DEFAULT 0.0 CHECK (rating_sell >= 0 AND rating_sell <= 5),
+            status TEXT CHECK (status IN ('active', 'banned', 'deleted')) DEFAULT 'active',
+            created_at TEXT NOT NULL DEFAULT (datetime('now', 'utc')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now', 'utc'))
         )
         """)
 
@@ -112,8 +120,3 @@ class Database:
             WHERE id = NEW.id;
         END
         """)
-
-
-if __name__ == "__main__":
-    db = Database("file:local.db")
-    asyncio.run(db.create_tables())
